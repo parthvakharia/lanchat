@@ -9,16 +9,30 @@ const App = () => {
   const [networkIP, setNetworkIP] = useState(null);
   const [port, setPort] = useState(null);
 
-  const setClientNameInterval = setInterval(() => {
-    var name = document.getElementById("clientName")?.value;
-    var ip = document.getElementById("networkIP")?.value;
-    var portToConnect = document.getElementById("port")?.value;
+  useEffect(() => {
+    const setClientNameInterval = setInterval(() => {
+      var initData = JSON.parse(localStorage.getItem("init")) || {};
+      console.log(initData);
+      var name =
+        initData.clientName || document.getElementById("clientName")?.value;
+      var ip =
+        initData.networkIP || document.getElementById("networkIP")?.value;
+      var portToConnect =
+        initData.port || document.getElementById("port")?.value;
 
-    if (name && !clientName) setClientName(name);
-    if (ip && !networkIP) setNetworkIP(ip);
-    if (portToConnect && !port) setPort(portToConnect);
-    if (networkIP && clientName) clearInterval(setClientNameInterval);
-  }, 200);
+      if (name && !clientName) setClientName(name);
+      if (ip && !networkIP) setNetworkIP(ip);
+      if (portToConnect && !port) setPort(portToConnect);
+      if (name && ip && portToConnect) clearInterval(setClientNameInterval);
+    }, 300);
+  }, []);
+
+  useEffect(() => {
+    if (clientName && networkIP && port) {
+      const json = { clientName, networkIP, port };
+      localStorage.setItem("init", JSON.stringify(json));
+    }
+  }, [clientName, networkIP, port]);
 
   return (
     <div className="App">

@@ -59,14 +59,19 @@ const findActiveWebsocket = async () => {
   }
 };
 
+const startSockets = async () => {
+  const currentIP = getCurrentIP();
+  const activeWebsocketIP = await findActiveWebsocket();
+  IP_TO_CONNECT = activeWebsocketIP || currentIP;
+  if (!activeWebsocketIP) {
+    startSocketServer(WEBSOCKET_PORT);
+  }
+  console.log("Starting socket and setting variables");
+}
+
 const createWindow = async () => {
   try {
-    const currentIP = getCurrentIP();
-    const activeWebsocketIP = await findActiveWebsocket();
-    IP_TO_CONNECT = activeWebsocketIP || currentIP;
-    if (!activeWebsocketIP) {
-      startSocketServer(WEBSOCKET_PORT);
-    }
+    await startSockets();
     const win = new BrowserWindow({
       width: 800,
       height: 600,
@@ -86,7 +91,6 @@ const createWindow = async () => {
         COMPUTER_NAME,
         WEBSOCKET_PORT,
       });
-      // { mode: "detach" }
     }
   } catch (e) {
     console.log(e);
