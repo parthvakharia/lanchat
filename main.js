@@ -1,14 +1,14 @@
-const os = require("os");
-const net = require("net");
-const { app, BrowserWindow } = require("electron");
-const isDev = require("electron-is-dev");
-const path = require("path");
-const find = require("local-devices");
+const os = require('os');
+const net = require('net');
+const { app, BrowserWindow } = require('electron');
+const isDev = require('electron-is-dev');
+const path = require('path');
+const find = require('local-devices');
 const WEBSOCKET_PORT = 9876;
 const COMPUTER_NAME = os.hostname();
-let IP_TO_CONNECT = "";
+let IP_TO_CONNECT = '';
 
-const startSocketServer = require("./app/socket");
+const startSocketServer = require('./app/socket');
 const { INIT_DATA } = require('./event');
 
 const checkConnection = (host, port, timeout) => {
@@ -23,7 +23,7 @@ const checkConnection = (host, port, timeout) => {
       resolve(host);
       socket.end();
     });
-    socket.on("error", function (err) {
+    socket.on('error', function (err) {
       clearTimeout(timer);
       resolve();
     });
@@ -32,12 +32,12 @@ const checkConnection = (host, port, timeout) => {
 
 const getCurrentIP = () => {
   const iFaces = os.networkInterfaces();
-  let ip = "";
+  let ip = '';
   for (var a in iFaces) {
     for (var b in iFaces[a]) {
       var addr = iFaces[a][b];
-      if (addr.family === "IPv4" && !addr.internal) {
-        console.log("Network IP: " + addr.address);
+      if (addr.family === 'IPv4' && !addr.internal) {
+        console.log('Network IP: ' + addr.address);
         ip = addr.address;
         break;
       }
@@ -48,7 +48,7 @@ const getCurrentIP = () => {
 
 const findActiveWebsocket = async () => {
   try {
-    const devices = await find();
+    const devices = await find(null, true);
     const promises = devices.map(({ ip }) =>
       checkConnection(ip, WEBSOCKET_PORT, 1000)
     );
@@ -66,8 +66,8 @@ const startSockets = async () => {
   if (!activeWebsocketIP) {
     startSocketServer(WEBSOCKET_PORT);
   }
-  console.log("Starting socket and setting variables");
-}
+  console.log('Starting socket and setting variables');
+};
 
 const createWindow = async () => {
   try {
@@ -76,21 +76,20 @@ const createWindow = async () => {
       width: 800,
       height: 600,
       webPreferences: {
-        preload: path.join(__dirname, "preload.js"),
+        preload: path.join(__dirname, 'preload.js'),
       },
     });
     const loadFrontEndFrom = isDev
-      ? "http://localhost:3000"
-      : `file://${path.join(__dirname, "./views/build/index.html")}`;
+      ? 'http://localhost:3000'
+      : `file://${path.join(__dirname, './views/build/index.html')}`;
+    win.webContents.send(INIT_DATA, {
+      IP_TO_CONNECT,
+      COMPUTER_NAME,
+      WEBSOCKET_PORT,
+    });
     win.loadURL(loadFrontEndFrom);
-
     if (isDev) {
       win.webContents.openDevTools();
-      win.webContents.send(INIT_DATA, {
-        IP_TO_CONNECT,
-        COMPUTER_NAME,
-        WEBSOCKET_PORT,
-      });
     }
   } catch (e) {
     console.log(e);
@@ -99,11 +98,11 @@ const createWindow = async () => {
 
 app.whenReady().then(() => {
   createWindow();
-  app.on("activate", () => {
+  app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
 });
