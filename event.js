@@ -1,0 +1,1 @@
+exports.INIT_DATA = "INIT_DATA";

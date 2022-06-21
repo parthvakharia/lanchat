@@ -23,6 +23,7 @@
     "electron-is-dev": "^2.0.0",
     "express": "^4.17.2",
     "http": "^0.0.1-security",
+    "local-devices": "^3.2.0",
     "os": "^0.1.2",
     "socket.io": "^4.4.0"
   }

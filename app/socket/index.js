@@ -1,8 +1,8 @@
 const app = require("express")();
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
+
 const clients = {};
-const port = 9876;
 
 io.use(function (socket, next) {
   var handshakeData = socket.request;
@@ -27,7 +27,7 @@ const retryStartingServer = (err) => {
   }
 };
 
-const startSocketServer = () => {
+const startSocketServer = (port) => {
   io.on("connection", (socket) => {
     clients[socket.id] = socket;
     console.log("👾 New socket connected! >>", socket.stats);

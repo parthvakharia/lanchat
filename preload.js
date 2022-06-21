@@ -1,20 +1,9 @@
-const os = require("os");
-const computerName = os.hostname();
-const ifaces = os.networkInterfaces();
-let networkIP = null;
+const { ipcRenderer } = require("electron");
+const { INIT_DATA } = require("./event");
 
-for (var a in ifaces) {
-  for (var b in ifaces[a]) {
-    var addr = ifaces[a][b];
-    if (addr.family === "IPv4" && !addr.internal) {
-      console.log("Network IP: " + addr.address);
-      networkIP = addr.address;
-      break;
-    }
-  }
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("clientName").value = computerName;
-  document.getElementById("networkIP").value = networkIP;
+ipcRenderer.on(INIT_DATA, (event, store) => {
+  const { IP_TO_CONNECT, COMPUTER_NAME, WEBSOCKET_PORT } = store;
+  document.getElementById("clientName").value = COMPUTER_NAME;
+  document.getElementById("networkIP").value = IP_TO_CONNECT;
+  document.getElementById("port").value = WEBSOCKET_PORT;
 });

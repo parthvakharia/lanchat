@@ -7,7 +7,7 @@ const ON_MESSAGE = "onMessage";
 const SocketContext = createContext();
 const { Provider } = SocketContext;
 
-const SocketProvider = ({ clientName, children }) => {
+const SocketProvider = ({ clientName, port, ip, children }) => {
   const [clients, setClients] = useState({});
   const [socket, setSocket] = useState(null);
 
@@ -75,12 +75,16 @@ const SocketProvider = ({ clientName, children }) => {
   };
 
   useEffect(() => {
-    const socket = io(`ws://localhost:9876`, {
-      transports: ["websocket"],
-      query: `name=${clientName}`,
-    });
-    setSocket(socket);
-  }, []);
+    if (ip && port) {
+      const socket = io(`ws://${ip}:${port}`, {
+        transports: ["websocket"],
+        query: `name=${clientName}`,
+      });
+      setSocket(socket);
+    } else {
+      console.log(`Cannot initialize socket with ip=${ip} and port=${port}`);
+    }
+  }, [ip, port]);
 
   useEffect(() => {
     if (!socket) return;
